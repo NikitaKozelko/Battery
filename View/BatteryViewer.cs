@@ -20,7 +20,7 @@ namespace Battery
 
         private bool isBatteryConditionUpdaterContinueWork;
 
-        private int batteryConditionUpdatingFrequency = 200;
+        private int batteryConditionUpdatingFrequency = 100;
 
         private const int DEFAULT_POWER_TIMEOUT_IN_MINUTES = 60;
 

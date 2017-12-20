@@ -10,9 +10,9 @@ namespace Battery
 {
     public class BatteryApi
     {
-        private const string BATTERY_STATUS_PROPERTY_NAME = "BatteryStatus";
-        private const string BATTERY_ESTIMATED_CHARGE_REMAINING_PROPERTY_NAME = "EstimatedChargeRemaining";
-        private const string BATTERY_ESTIMATED_RUNTIME_PROPERTY_NAME = "EstimatedRunTime";
+        private const string BatteryStatusPropertyName = "BatteryStatus";
+        private const string BatteryEstimatedChargeRemainingPropertyName = "EstimatedChargeRemaining";
+        private const string BatteryEstimatedRuntimePropertyName = "EstimatedRunTime";
 
         public static BatteryApi Instance { get; private set; }
 
@@ -39,13 +39,13 @@ namespace Battery
             foreach (ManagementObject wmiBattery in collection)
             {
                 batteryCondition
-                    .SetPlugType(Convert.ToInt32(wmiBattery[BATTERY_STATUS_PROPERTY_NAME]));
+                    .SetPlugType(Convert.ToInt32(wmiBattery[BatteryStatusPropertyName]));
 
                 batteryCondition
-                    .SetChargeStatus(Convert.ToInt32(wmiBattery[BATTERY_ESTIMATED_CHARGE_REMAINING_PROPERTY_NAME]));
+                    .SetChargeStatus(Convert.ToInt32(wmiBattery[BatteryEstimatedChargeRemainingPropertyName]));
 
                 batteryCondition
-                    .SetEstimatedRunTime(Convert.ToInt32(wmiBattery[BATTERY_ESTIMATED_RUNTIME_PROPERTY_NAME]));
+                    .SetEstimatedRunTime(Convert.ToInt32(wmiBattery[BatteryEstimatedRuntimePropertyName]));
             }
 
             return batteryCondition;
