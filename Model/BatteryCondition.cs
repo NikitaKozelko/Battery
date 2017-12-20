@@ -38,8 +38,8 @@ namespace Battery
         {
             if(IsEstimatedRunTimeValid(estimatedRunTime))
             {
-                EstimatedRunTime = (ESTIMATED_RUN_TIME_OF_CHARGING_BATTERY == estimatedRunTime) ? 
-                    BATTERY_IS_CHARGING_MESSAGE : EstimatedRunTime = $"{estimatedRunTime} minutes";
+                 EstimatedRunTime = (ESTIMATED_RUN_TIME_OF_CHARGING_BATTERY == estimatedRunTime) ? 
+                     BATTERY_IS_CHARGING_MESSAGE : EstimatedRunTime = $"{estimatedRunTime} minutes";
             }
         }
 
