@@ -16,9 +16,9 @@ namespace Battery
 
         public string EstimatedRunTime { get; private set; }
 
-        private static readonly int MAX_BATTERY_STATUS = 100;
-        private static readonly int MIN_BATTERY_STATUS = 0;
-        private static readonly string BATTERY_IS_CHARGING_MESSAGE = "battery is charging";
+        private const int MaxBatteryStatus = 100;
+        private const int MinBatteryStatus = 0;
+        private const string BatteryIsChargingMessage = "battery is charging";
         private const int EstimatedRunTimeOfChargingBattery = 71582788;
 
         public void SetPlugType(int plugTypeId)
@@ -39,13 +39,13 @@ namespace Battery
             if(IsEstimatedRunTimeValid(estimatedRunTime))
             {
                  EstimatedRunTime = (EstimatedRunTimeOfChargingBattery == estimatedRunTime) ? 
-                     BATTERY_IS_CHARGING_MESSAGE : EstimatedRunTime = $"{estimatedRunTime} minutes";
+                     BatteryIsChargingMessage : EstimatedRunTime = $"{estimatedRunTime} minutes";
             }
         }
 
         private bool IsChargeStatusValid(int chargeStatus)
         {
-            return chargeStatus > MIN_BATTERY_STATUS && chargeStatus <= MAX_BATTERY_STATUS;
+            return chargeStatus > MinBatteryStatus && chargeStatus <= MaxBatteryStatus;
         }
 
         private bool IsEstimatedRunTimeValid(int estimatedRunTime)
