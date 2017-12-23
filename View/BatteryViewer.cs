@@ -2,41 +2,46 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Management;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace Battery
 {
     public partial class BatteryViewer : Form
     {
-        private BatteryApi batteryApi;
+        private BatteryApi _batteryApi;
 
-        private Thread batteryConditionUpdater;
+        private Thread _batteryConditionUpdater;
 
-        private bool isBatteryConditionUpdaterContinueWork;
+        private bool _isBatteryConditionUpdaterContinueWork;
 
-        private int batteryConditionUpdatingFrequency = 100;
+        private int _batteryConditionUpdatingFrequency = 100;
 
-        private const int DEFAULT_POWER_TIMEOUT_IN_MINUTES = 60;
+        private int _defaultPowerTimeoutInMinutes = 60;
+
+        private const int TimeLen = 10;
 
         public BatteryViewer()
         {
+            _defaultPowerTimeoutInMinutes = GetCurrentTimeout();
             InitializeComponent();
         }
 
         private void BatteryViewer_Load(object sender, EventArgs e)
         {
-            batteryApi = BatteryApi.GetInstance();
+            _batteryApi = BatteryApi.GetInstance();
             
-            batteryApi.SetPowerTimeout(60);
-            isBatteryConditionUpdaterContinueWork = true;
-            batteryConditionUpdater = new Thread(UpdateBatteryConditIonProcedure);
-            batteryConditionUpdater.Start();
+            _batteryApi.SetPowerTimeout(60);
+            _isBatteryConditionUpdaterContinueWork = true;
+            _batteryConditionUpdater = new Thread(UpdateBatteryConditIonProcedure);
+            _batteryConditionUpdater.Start();
         }
 
         private void ExitButton_Click(object sender, EventArgs e)
@@ -48,11 +53,11 @@ namespace Battery
 
         private void UpdateBatteryConditIonProcedure()
         {
-            while (isBatteryConditionUpdaterContinueWork)
+            while (_isBatteryConditionUpdaterContinueWork)
             {
-                var batteryCondition = batteryApi.GetCurrentBatteryCondition();
+                var batteryCondition = _batteryApi.GetCurrentBatteryCondition();
                 UpdateBatteryCondition(batteryCondition);
-                Thread.Sleep(batteryConditionUpdatingFrequency);
+                Thread.Sleep(_batteryConditionUpdatingFrequency);
             }
         }
 
@@ -87,13 +92,13 @@ namespace Battery
 
         private void TurnOffBatteryConditionUpdater()
         {
-            isBatteryConditionUpdaterContinueWork = false;
-            batteryConditionUpdater.Abort();
+            _isBatteryConditionUpdaterContinueWork = false;
+            _batteryConditionUpdater.Abort();
         }
 
         private void SetDefaultPowerTimeout()
         {
-            batteryApi.SetPowerTimeout(DEFAULT_POWER_TIMEOUT_IN_MINUTES); 
+            _batteryApi.SetPowerTimeout(_defaultPowerTimeoutInMinutes); 
         }
 
         private void BatteryViewer_FormClosing(object sender, FormClosingEventArgs e)
@@ -106,12 +111,28 @@ namespace Battery
         private void TimeDisplaComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             int selectedValue = Int32.Parse(TimeDisplaComboBox.SelectedItem.ToString());
-            batteryApi.SetPowerTimeout(selectedValue);
+            _batteryApi.SetPowerTimeout(selectedValue);
         }
 
         private void batteryListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        public int GetCurrentTimeout()
+        {
+            var p = new Process();
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            p.StartInfo.FileName = "cmd.exe";
+            p.StartInfo.Arguments = "/c powercfg /q";
+            p.Start();
+            var powercfgOut = p.StandardOutput.ReadToEnd();
+            var reg = new Regex("VIDEOIDLE.*\\n.*\\n.*\\n.*\\n.*\\n.*\\n.*");
+            var videoidle = reg.Match(powercfgOut).Value;
+            var batteryIdle = videoidle.Substring(videoidle.Length - 1 - TimeLen).TrimEnd();
+            return Convert.ToInt32(batteryIdle, 16) / 60;
         }
     }
 }
