@@ -1,2 +1,2 @@
 # Battery
-Write information about youre battery with Usbeject.
+Write information about youre battery.
